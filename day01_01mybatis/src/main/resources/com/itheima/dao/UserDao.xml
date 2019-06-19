@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.UserDao">
+    <!-- 配置查询所有 -->
+    <select id="findAll" resultType="com.itheima.domain.User">
+        select * from user;
+    </select>
+
+    <!-- 配置添加用户 -->
+    <insert id="saveUser" parameterType="user">
+        <!--  配置保存时获取插入的 id -->
+        <selectKey keyColumn="id" keyProperty="id" resultType="int">
+            select last_insert_id();
+        </selectKey>
+
+        insert into user(username,birthday,sex,address)values(#{username},#{birthday},#{sex},#{address});
+    </insert>
+
+    <!-- 配置根据id查询用户 -->
+    <select id="findById" parameterType="int" resultType="user">
+        select * from user where id=#{id};
+    </select>
+
+    <!-- 配置更新用户 -->
+    <update id="updateUser" parameterType="user">
+        update user set username=#{username},birthday=#{birthday},sex=#{sex},address=#{address} where id=#{id};
+    </update>
+
+    <!-- 配置删除用户 -->
+    <delete id="deleteUser" parameterType="int">
+        delete from user where id=#{id};
+    </delete>
+
+    <!-- 配置模糊查询用户信息 -->
+    <select id="findByName" parameterType="string" resultType="user">
+        select * from user where username like #{username};
+    </select>
+
+    <!-- 配置查询总记录数 -->
+    <select id="findTotal" resultType="int">
+        select count(*) from user;
+    </select>
+
+    <!-- 配置动态sql查询用户信息 之where标签的使用-->
+    <select id="findByUser" resultType="user" parameterType="user">
+        select * from user
+        <where>
+            <if test="username != null and username != ''">
+                and username like #{username}
+            </if>
+            <if test="address != null">
+                and address like #{address}
+            </if>
+        </where>
+    </select>
+
+    <!-- 配置动态标签之foreach -->
+    <select id="findInIds" resultType="user" parameterType="queryvo">
+        select * from user
+        <where>
+            <if test="ids != null and ids.size>0">
+              <foreach collection="ids" open="id in (" close=")" item="uid" separator=",">
+                  #{uid}
+              </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>
